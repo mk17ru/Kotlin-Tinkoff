@@ -22,7 +22,7 @@ fun main() {
     }
 
     with(apple) {
-        releaseNewIphone("Iphone-2021")
+        releaseNewIphone("Iphone-2021!")
     }
     val companies = listOf(apple, tinkoff, yandex, google)
     companies.forEach{ it.printName() }
