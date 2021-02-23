@@ -15,4 +15,8 @@ abstract class Company {
     }
 
     protected abstract fun updateIncome();
+
+    fun printIncome() {
+        println("Income '${income}'")
+    }
 }

@@ -7,23 +7,25 @@ fun main() {
 
     with(yandex) {
         printName()
-        println("Income " + getIncome())
+        printIncome();
         updateIncome()
-        println("Income " + getIncome())
+        printIncome();
         updateIncome(100)
-        println("Income " + getIncome())
+        printIncome();
     }
 
     with(tinkoff) {
         printName()
-        println("Income " + getIncome())
+        printIncome();
         updateIncome()
-        println("Income " + getIncome())
+        printIncome();
     }
 
     with(apple) {
-        println("Income " + getIncome())
+        printIncome();
         releaseNewIphone("Iphone-2021!")
+        updateIncome()
+        printIncome();
     }
     val companies = listOf(apple, tinkoff, yandex, google)
     companies.forEach{ it.printName() }
