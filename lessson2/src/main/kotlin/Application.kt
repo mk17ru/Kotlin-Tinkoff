@@ -22,6 +22,7 @@ fun main() {
     }
 
     with(apple) {
+        println("Income " + getIncome())
         releaseNewIphone("Iphone-2021!")
     }
     val companies = listOf(apple, tinkoff, yandex, google)
