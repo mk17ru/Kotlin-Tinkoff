@@ -19,11 +19,13 @@ class Queue<T>(elements: List<T>) {
         return elements.size;
     }
 
-    fun <T> queueOf(vararg els: T): Queue<T> {
-        return if (els.isNotEmpty()) {
-            Queue(els.asList())
-        } else {
-            Queue<T>(emptyList())
+    companion object {
+        fun <T> queueOf(vararg els: T): Queue<T> {
+            return if (els.isNotEmpty()) {
+                Queue(els.asList())
+            } else {
+                Queue<T>(emptyList())
+            }
         }
     }
 

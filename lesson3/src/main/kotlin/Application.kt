@@ -12,4 +12,15 @@ fun main() {
     while(!stack.empty()) {
         println(stack.pop())
     }
+    println("---------------------------------")
+    val que = Queue.queueOf(1, 2, 3, 4, 5);
+    while(!que.empty()) {
+        println(que.dequeue())
+    }
+    println("---------------------------------")
+    val sta = Stack.stackOf(1, 2, 3, 4, 5);
+    while(!sta.empty()) {
+        println(sta.pop())
+    }
+
 }

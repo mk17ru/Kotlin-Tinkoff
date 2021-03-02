@@ -15,11 +15,13 @@ class Stack<T>(elements: List<T>) {
         return elements.size;
     }
 
-    fun <T> stackOf(vararg els: T): Stack<T> {
-        return if (els.isNotEmpty()) {
-            Stack(els.asList())
-        } else {
-            Stack(emptyList())
+    companion object {
+        fun <T> stackOf(vararg els: T): Stack<T> {
+            return if (els.isNotEmpty()) {
+                Stack(els.asList())
+            } else {
+                Stack(emptyList())
+            }
         }
     }
 
