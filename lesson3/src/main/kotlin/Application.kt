@@ -19,6 +19,8 @@ fun main() {
     }
     println("---------------------------------")
     val sta = Stack.stackOf(1, 2, 3, 4, 5);
+    sta.push(1);
+    println(sta.pop().toString() + " working!");
     while(!sta.empty()) {
         println(sta.pop())
     }

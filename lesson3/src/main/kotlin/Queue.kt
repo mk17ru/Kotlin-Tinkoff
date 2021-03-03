@@ -8,6 +8,7 @@ class Queue<T>(elements: List<T>) {
     }
 
     fun dequeue() : T {
+        println("work deque queue!")
         return elements.pollFirst()
     }
 

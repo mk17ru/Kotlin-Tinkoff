@@ -8,6 +8,7 @@ class Stack<T>(elements: List<T>) {
     }
 
     fun pop() : T {
+        println("work stack pop!")
         return elements.pollLast()
     }
 
