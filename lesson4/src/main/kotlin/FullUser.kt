@@ -1,0 +1,1 @@
+data class FullUser(val userId: Int, val userName: String, val userSurname: String, val userPosts : List<Post>)
