@@ -1,4 +1,4 @@
-class Posts {
+class PostsDAO {
 
     private val posts : List<Post> = listOf(
             Post(1, 1, "Доброе утро!", listOf(2)),

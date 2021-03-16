@@ -1,16 +1,9 @@
 fun main() {
     val mikhail = User(1,"Misha", "K")
     val nikita = User(2,"Nikita", "R")
-
-    val users = Users().getUsers()
-    val posts = Posts().getPosts()
-    val groupPostByUser = posts.groupBy {it.userId}
-    val firstTaskList = users.map{ currentUser ->
-        val obj2 = Posts().getPostsByUser(currentUser.userId)
-        FullUser(currentUser.userId, currentUser.name, currentUser.surname, obj2)
-    }
+    val server = Server(UsersDAO(), PostsDAO())
     println("1 Task")
-    firstTaskList.forEach{ curUser ->
+    server.getFullUsers().forEach{ curUser ->
         with(curUser) {
             println("$userName $userSurname")
             println("UserId: $userId")
@@ -29,8 +22,7 @@ fun main() {
         println("-------------------------------------------")
     }
     println("2 Task")
-    val secondTask = firstTaskList.sortedBy { it.userName }
-    secondTask.forEach { curUser ->
+    server.getSortedFullUsers().forEach { curUser ->
         with(curUser) {
             println("$userName $userSurname")
             println("UserId: $userId")
@@ -38,8 +30,7 @@ fun main() {
         }
     }
     println("3 Task")
-    val thirdTask = firstTaskList.groupBy { it.userPosts.isNotEmpty() }
-    thirdTask.forEach { curPair ->
+    server.groupFullUsersByPostsExist().forEach { curPair ->
         if (curPair.key) {
             println("They have posts:")
         } else {
@@ -56,6 +47,5 @@ fun main() {
         }
     }
     println("4 Task")
-    val forthTask = firstTaskList.count{ it.userPosts.isEmpty() }
-    println("$forthTask users haven't posts!")
+    println(server.countFullUsersWithoutPosts().toString() + " users haven't posts!")
 }
