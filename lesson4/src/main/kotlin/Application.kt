@@ -47,5 +47,6 @@ fun main() {
         }
     }
     println("4 Task")
-    println(server.countFullUsersWithoutPosts().toString() + " users haven't posts!")
+    println(server.countFullUsersByPredicate { user: FullUser -> user.userPosts.isEmpty() }.toString()
+                                                                                    + " users haven't posts!")
 }

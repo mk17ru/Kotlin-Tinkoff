@@ -1,3 +1,6 @@
+import java.util.function.BiPredicate
+import java.util.function.Predicate
+
 class Server(val users: UsersDAO, val posts: PostsDAO) {
     fun getFullUsers() : List<FullUser> {
         return users.getUsers().map{ currentUser ->
@@ -14,7 +17,7 @@ class Server(val users: UsersDAO, val posts: PostsDAO) {
         return getFullUsers().groupBy { it.userPosts.isNotEmpty() }
     }
 
-    fun countFullUsersWithoutPosts() : Int {
-        return getFullUsers().count{ it.userPosts.isEmpty() }
+    fun countFullUsersByPredicate(predicate: Predicate<FullUser>) : Int {
+        return getFullUsers().count{ predicate.test(it) }
     }
 }
