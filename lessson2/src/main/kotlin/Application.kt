@@ -4,7 +4,6 @@ fun main() {
     val google = Search(10000000, 10000, "Google")
     val tinkoff = Bank(2000000, 500, "Tinkoff")
     val apple = HiTech(342349322, 30000, "Apple")
-
     with(yandex) {
         printName()
         printIncome();
