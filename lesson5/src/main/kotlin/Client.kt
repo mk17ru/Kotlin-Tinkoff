@@ -2,9 +2,7 @@ import java.lang.IllegalArgumentException
 import java.lang.StringBuilder
 import java.sql.Connection
 import java.sql.ResultSet
-import java.sql.Statement
 import java.util.*
-import kotlin.reflect.KFunction1
 
 class Client(private val conn : Connection) {
 
@@ -23,7 +21,7 @@ class Client(private val conn : Connection) {
         for (i in postData.getPosts()) {
             insertValue(
                 "posts", arrayOf("user_id", "text"),
-                "${i.userId}", "${i.text}"
+                "${i.userId}", i.text
             )
         }
     }
@@ -74,12 +72,19 @@ class Client(private val conn : Connection) {
         stm.executeUpdate(sb.toString())
     }
 
+    /**
+     * Insert values in table
+     */
     fun <T> insertValue(tableName: String, columnNames: Array<String>, vararg fields : T) {
         val sb = StringBuilder();
         sb.append("INSERT INTO $tableName ")
         addArguments(sb, columnNames, true)
-        sb.append(" VALUES(${"?, ".repeat(fields.size).substring(0, 3 * fields.size - 2)}) ")
+        sb.append(" VALUES(")
+        // CREATE (?, ?, ?, ...) for VALUES(?, ?, ...)
+        sb.append("?, ".repeat(fields.size).substring(0, 3 * fields.size - 2))
+        sb.append(" ")
         val stm = conn.prepareStatement(sb.toString())
+        // REPLACE ? for the inserted fields
         for (i in fields.indices) {
             if (fields[i] is Int) {
                 stm.setInt(i + 1, fields[i].toString().toInt())
@@ -90,6 +95,14 @@ class Client(private val conn : Connection) {
         stm.execute()
     }
 
+    /**
+     * Select values from table
+     * @param tableName table
+     * @param columnNames columns which select
+     * @param field criterion for select
+     * @param sortValue value which is the key for sorting
+     * @param DESCOrder is DESC order or not default value is false
+     */
     fun selectValue(tableName: String, columnNames: Array<String>, field: String, value : String, sortValue: String,
                                                     DESCOrder : Boolean=false) : List<String> {
         val sb = StringBuilder();
@@ -158,11 +171,22 @@ class Client(private val conn : Connection) {
         sb.append(" FROM $tableName WHERE id > ? ORDER BY id ASC")
         val stm = conn.prepareStatement(sb.toString());
         stm.setString(1, id.toString());
-        val ps = stm.executeQuery()
         chooseFromResultSet(stm.executeQuery(), arrayOf(findingField));
         return answer
     }
 
+
+    /**
+     * Create Inner Join Users and Posts
+     * @param firstTableName first table name
+     * @param secondTableName first table name
+     * @param firstFileds fields from first table
+     * @param secondFields fields from second table
+     * @param firstCommonField filed from first table which use for join
+     * @param secondCommonField filed from second table which use for join
+     * @param type type of join
+     * @return {@link List<UserAndPosts>}
+     */
     fun innerJoin(firstTableName: String, secondTableName: String,
                          firstFields: Array<String>, secondFields: Array<String>,
                                         firstCommonField : String, secondCommonField : String,
@@ -172,13 +196,16 @@ class Client(private val conn : Connection) {
         var columnNames = firstFields + secondFields
         addArguments(sb, columnNames, false)
         sb.append(" FROM $firstTableName $type ")
-        sb.append("JOIN $secondTableName ON $firstTableName.$firstCommonField=$secondTableName.$secondCommonField")
+        sb.append(" JOIN $secondTableName ON $firstTableName.$firstCommonField=$secondTableName.$secondCommonField")
         sb.append(" ORDER BY user_id ASC")
         columnNames = changeColumnsNames(columnNames)
         val stm = conn.prepareStatement(sb.toString());
         return chooseFromResultSet(stm.executeQuery(), columnNames);
     }
 
+    /**
+     * Choose columnNames from resultSet
+     */
     fun chooseFromResultSet(rs : ResultSet, columnNames: Array<String>): ArrayList<String> {
         val answer = ArrayList<String>();
         while(rs.next()) {
@@ -203,6 +230,17 @@ class Client(private val conn : Connection) {
             firstCommonField, secondCommonField, "INNER"));
     }
 
+
+    /**
+     * Create Left Inner Join Users and Posts
+     * @param firstTableName first table name
+     * @param secondTableName first table name
+     * @param firstFileds fields from first table
+     * @param secondFields fields from second table
+     * @param firstCommonField filed from first table which use for join
+     * @param secondCommonField filed from second table which use for join
+     * @return {@link List<UserAndPosts>}
+     */
     fun getInnerLeftUsersAndPosts(firstTableName: String, secondTableName: String, firstFields: Array<String>,
                                   secondFields: Array<String>, firstCommonField: String,
                                   secondCommonField: String): List<UserAndPosts> {
@@ -210,12 +248,20 @@ class Client(private val conn : Connection) {
             firstCommonField, secondCommonField, "LEFT"))
     }
 
+
+    /**
+     * Collect UserAnsPosts from List<String>
+     */
     private fun toUserAndPosts(list: List<String>) : UserAndPosts {
         if (list.size != 4) {
             throw IllegalArgumentException("Can't create User expected 4 arguments, but found ${list.size}")
         }
         return UserAndPosts(Integer.parseInt(list[0]), list[1], list[2], list[3]);
     }
+
+    /**
+     * Collect UserAnsPosts to list by List<String>
+     */
     private fun toUserAndPostsList(list: List<String>) : List<UserAndPosts> {
         val result = ArrayList<UserAndPosts>()
         for (i in 0..list.size - 3) {
@@ -227,18 +273,26 @@ class Client(private val conn : Connection) {
         return result;
     }
 
+    /**
+     * Group Users by their roles
+     * @return ArrayList<ArrayList<UserWithRoles>> where Map role -> users
+     */
     fun groupUsersByRoles(): ArrayList<UserWithRoles> {
         val result = ArrayList<UserWithRoles>()
         val sb = StringBuilder();
         var columnNames : Array<String> = arrayOf("roles.role", "GROUP_CONCAT(users.surname)")
-        sb.append("SELECT ")
-        addArguments(sb, columnNames, false)
-        sb.append(" FROM roles ")
-        sb.append(" INNER JOIN user_roles ON user_roles.role_id=roles.id")
-        sb.append(" INNER JOIN users ON user_roles.user_id=users.id")
-        sb.append(" GROUP BY roles.role ORDER BY roles.id ASC")
+        //SELECT BLOCK
+            sb.append("SELECT ")
+            addArguments(sb, columnNames, false)
+            sb.append(" FROM roles ")
+        //INNER
+            sb.append(" INNER JOIN user_roles ON user_roles.role_id=roles.id")
+            sb.append(" INNER JOIN users ON user_roles.user_id=users.id")
+        // GROUP
+            sb.append(" GROUP BY roles.role ORDER BY roles.id ASC")
+        // STATEMENT
         val stm = conn.prepareStatement(sb.toString());
-        val ps = stm.executeQuery()
+        // CHOOSE ANSWER FIELD FROM RESULT SET
         columnNames = changeColumnsNames(columnNames)
         val list = chooseFromResultSet(stm.executeQuery(), columnNames)
         for (i in list.indices) {
