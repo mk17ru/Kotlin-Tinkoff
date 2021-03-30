@@ -25,6 +25,7 @@ class DSLTest {
             {assertEquals(10, office.getCoffeePackets())},
             {assertEquals("Ilya", office.getBossName())},
             {assertEquals("Svetlana", office.secretaryName)},
+
             {assertEquals(false, office.buyCoffee(2)) },
             {assertEquals(testOffice.getCoffeePackets(),
                                         MiniOfficeDSL("Boss", "Svetlana").getCoffeePackets())}
