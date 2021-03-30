@@ -1,1 +1,0 @@
-data class Post(val userId : Int, val postId : Int, val text : String, val comments : List<Int>)
