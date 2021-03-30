@@ -2,45 +2,23 @@ import java.sql.Connection
 import java.sql.Statement
 import java.util.ArrayList
 
-class Service(stm: Statement, conn: Connection) {
-    private val client : Client = Client(stm, conn)
+class Service(conn: Connection) {
+    private val client : Client = Client(conn)
 
     fun addUsers() {
-        val userData = UsersDAO()
-        for (i in userData.getUsers()) {
-            client.insertValue(
-                "'users'", arrayOf("'name'", "'surname'"),
-                "'${i.name}'", "'${i.surname}'"
-            )
-        }
+        client.addUsers()
     }
 
     fun addPosts() {
-        val postData = PostsDAO()
-        for (i in postData.getPosts()) {
-            client.insertValue(
-                "'posts'", arrayOf("'user_id'", "'text'"),
-                "'${i.userId}'", "'${i.text}'"
-            )
-        }
+        client.addPosts()
     }
 
     fun addRoles() {
-        for (i in Role.values()) {
-            client.insertValue("'roles'", arrayOf("'role'"), "'${i}'")
-        }
+        client.addRoles()
     }
 
     fun addUserRoles() {
-        val userRolesData = UserRolesDAO()
-        for (userRole in userRolesData.getUserRoles()) {
-            val list = findRolesIdByName(userRole.user_role)
-            println("ROLE ID: " + list[0])
-            client.insertValue(
-                "'user_roles'", arrayOf("'user_id'", "'role_id'"),
-                "'${userRole.userId}'", "'${list[0]}'"
-            )
-        }
+        client.addUserRoles()
     }
 
     fun createTable(tableName: String, vararg fields: String) {
@@ -52,7 +30,7 @@ class Service(stm: Statement, conn: Connection) {
     }
 
     fun findRolesIdByName(role: Role) : List<String> {
-        return client.selectValue("roles", arrayOf("id"), null," WHERE role = '${role}'")
+        return client.findRolesIdByName(role);
     }
 
     fun findElementsGreaterThanId(tableName: String, id : Int, field : String) : List<String> {

@@ -3,14 +3,13 @@ import java.sql.DriverManager
 import java.sql.SQLException
 
 val fileName = "/Kotlin/lesson5/src/main/resources/test.db"
-    val DB_URL = "jdbc:sqlite:/Kotlin/lesson5/src/main/resources/test.db"
+val DB_URL = "jdbc:sqlite:/Kotlin/lesson5/src/main/resources/test.db"
 fun main() {
 
     try {
         val isExists = File(fileName).exists()
         val conn = DriverManager.getConnection(DB_URL)
-        val stm = conn.createStatement()
-        val dataBase = Service(stm, conn)
+        val dataBase = Service(conn)
         val init = TableInitializator(dataBase)
         if (!isExists) {
             init.createTables();
@@ -47,8 +46,7 @@ fun main() {
     } catch (exception : SQLException) {
         println(exception.message)
     }
-
-
+    
 }
 
 fun printTaskName(num : Int, text : String)  {
