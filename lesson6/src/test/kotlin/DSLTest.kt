@@ -6,8 +6,13 @@ import org.junit.jupiter.api.assertAll
 
 class DSLTest {
 
+    private fun createMock(user : User, client : Client, ) {
+
+
+    }
+
     @Test
-    fun `MiniOffice test in dsl style`() {
+    fun `Default values should be returned`() {
         val testOffice = MiniOfficeDSL("Boss", "Svetlana")
         testOffice.orderCoffee()
         val office = mockk<MiniOfficeDSL> {
@@ -19,7 +24,7 @@ class DSLTest {
             every { buyCoffee(any())} returns false
             every{MiniOfficeDSL {orderCoffee()}}
         }
-        assertAll("Default values should be returned",
+        assertAll(,
             {assertEquals(true, office.orderCoffee())},
             {assertEquals(100, office.getMoney())},
             {assertEquals(10, office.getCoffeePackets())},
