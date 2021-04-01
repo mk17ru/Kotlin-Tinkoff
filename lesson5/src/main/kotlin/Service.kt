@@ -29,9 +29,6 @@ class Service(conn: Connection) {
         return client.findUsersByName(name, "id")
     }
 
-    fun findRolesIdByName(role: Role) : List<String> {
-        return client.findRolesIdByName(role);
-    }
 
     fun findElementsGreaterThanId(tableName: String, id : Int, field : String) : List<String> {
         return client.findElementsGreaterThanId(tableName, id, field)

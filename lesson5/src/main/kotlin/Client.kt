@@ -3,74 +3,9 @@ import java.lang.StringBuilder
 import java.sql.Connection
 import java.sql.ResultSet
 import java.util.*
+import kotlin.collections.ArrayList
 
 class Client(private val conn : Connection) {
-
-    fun addUsers() {
-        val userData = UsersDAO()
-        for (i in userData.getUsers()) {
-            insertValue(
-                "users", arrayOf("name", "surname"),
-                "${i.name}", "${i.surname}"
-            )
-        }
-    }
-
-    fun addPosts() {
-        val postData = PostsDAO()
-        for (i in postData.getPosts()) {
-            insertValue(
-                "posts", arrayOf("user_id", "text"),
-                "${i.userId}", i.text
-            )
-        }
-    }
-
-    fun addRoles() {
-        for (i in Role.values()) {
-            insertValue("roles", arrayOf("role"), "${i}")
-        }
-    }
-
-    fun addUserRoles() {
-        val userRolesData = UserRolesDAO()
-        for (userRole in userRolesData.getUserRoles()) {
-            val list = findRolesIdByName(userRole.user_role)
-            println("ROLE ID: " + list[0])
-            insertValue(
-                "user_roles", arrayOf("user_id", "role_id"),
-                userRole.userId, list[0]
-            )
-        }
-    }
-
-    fun findRolesIdByName(userRole: Role): List<String> {
-        return selectValue("roles", arrayOf("id"),"role", userRole.toString(), "role", false)
-    }
-
-    fun addArguments(sb : StringBuilder, fields : Array<out String>, needBrackets : Boolean) {
-        if (needBrackets) {
-            sb.append("(");
-        }
-        for (i in fields.indices) {
-            sb.append(fields[i])
-            if (i + 1 != fields.size) {
-                sb.append(", ")
-            }
-        };
-        if (needBrackets) {
-            sb.append(")")
-        }
-    }
-
-    fun createTable(tableName: String, fields: Array<out String>) {
-        val stm = conn.createStatement()
-        val sb = StringBuilder();
-        sb.append("CREATE TABLE IF NOT EXISTS $tableName ");
-        addArguments(sb, fields, true);
-        println(sb.toString())
-        stm.executeUpdate(sb.toString())
-    }
 
     /**
      * Insert values in table
@@ -95,6 +30,69 @@ class Client(private val conn : Connection) {
         stm.execute()
     }
 
+    fun addUsers() {
+        val userData = UsersDAO()
+        for (i in userData.getUsers()) {
+            insertValue(
+                "users", arrayOf("name", "surname"), i.name, i.surname
+            )
+        }
+    }
+
+    fun addPosts() {
+        val postData = PostsDAO()
+        for (i in postData.getPosts()) {
+            insertValue(
+                "posts", arrayOf("user_id", "text"), "${i.userId}", i.text
+            )
+        }
+    }
+
+    fun addRoles() {
+        for (i in Role.values()) {
+            insertValue("roles", arrayOf("role"), "$i")
+        }
+    }
+
+    fun addUserRoles() {
+        val userRolesData = UserRolesDAO()
+        for (userRole in userRolesData.getUserRoles()) {
+            val id = findRolesIdByName(userRole.user_role)
+            insertValue(
+                "user_roles", arrayOf("user_id", "role_id"),
+                userRole.userId, id
+            )
+        }
+    }
+
+    fun findRolesIdByName(userRole: Role): Int {
+        var id: Int
+        selectValue("roles", arrayOf("id"),"role", userRole.toString(), "role", false)
+            .use {
+                resultSet ->
+                id = if (resultSet.next()) 0 else resultSet.getInt("id")
+            }
+        return id
+    }
+
+    fun addArguments(sb : StringBuilder, fields : Array<out String>, needBrackets : Boolean) {
+        if (needBrackets) {
+            sb.append("(")
+        }
+        sb.append(fields.joinToString(", "))
+        if (needBrackets) {
+            sb.append(")")
+        }
+    }
+
+    fun createTable(tableName: String, fields: Array<out String>) {
+        val stm = conn.createStatement()
+        val sb = StringBuilder();
+        sb.append("CREATE TABLE IF NOT EXISTS $tableName ");
+        addArguments(sb, fields, true);
+        println(sb.toString())
+        stm.executeUpdate(sb.toString())
+    }
     /**
      * Select values from table
      * @param tableName table
@@ -104,7 +102,7 @@ class Client(private val conn : Connection) {
      * @param DESCOrder is DESC order or not default value is false
      */
     fun selectValue(tableName: String, columnNames: Array<String>, field: String, value : String, sortValue: String,
-                                                    DESCOrder : Boolean=false) : List<String> {
+                                                    DESCOrder : Boolean=false) : ResultSet {
         val sb = StringBuilder();
         sb.append("SELECT ");
         addArguments(sb, columnNames, false)
@@ -117,50 +115,20 @@ class Client(private val conn : Connection) {
         }
         val stm = conn.prepareStatement(sb.toString());
         stm.setString(1, value);
-        return chooseFromResultSet(stm.executeQuery(), columnNames);
+        return stm.executeQuery()
     }
-
-    fun changeColumnsNames(columnNames: Array<String>): Array<String> {
-        for (i in columnNames.indices) {
-            if (columnNames[i].indexOf("GROUP_CONCAT") != -1) {
-                continue;
-            }
-            columnNames[i] = columnNames[i].split(".").last()
-        }
-        return columnNames
-    }
-
 
     fun findUsersByName(name : String, sortValue: String, DESCOrder: Boolean=false) : List<User> {
-        val list = selectValue("users",
-                                    arrayOf("id", "name", "surname"),
-                                                "name", name, sortValue, DESCOrder)
-        val result = ArrayList<User>()
-        if (list.size % 3 != 0) {
-            throw IllegalArgumentException("Can't create Users expected % 3 == 0 number of arguments, " +
-                    " (id, name, surname) but found ${list.size}")
+        val rs = selectValue("users", arrayOf("id", "name", "surname"), "name", name, sortValue, DESCOrder)
+        val userList = ArrayList<User>()
+        while (rs.next()) {
+            userList.add(User(
+                id = rs.getInt("id"),
+                name = rs.getString("name"),
+                surname = rs.getString("surname")
+            ))
         }
-        for (i in 0..list.size - 2) {
-            if (i % 3 != 0) {
-                continue
-            }
-            result.add(toUser(listOf(list[i], list[i + 1], list[i + 2])))
-        }
-        return result
-    }
-
-    private fun toUser(list: List<String>) : User {
-        if (list.size != 3) {
-            throw IllegalArgumentException("Can't create User expected 3 arguments, but found ${list.size}")
-        }
-        return User(Integer.parseInt(list[0]), list[1], list[2])
-    }
-
-    private fun toUserRole(list: List<String>) : UserWithRoles {
-        if (list.size != 2) {
-            throw IllegalArgumentException("Can't create User expected 2 arguments, but found ${list.size}")
-        }
-        return UserWithRoles(Role.valueOf(list[0]), list[1])
+        return userList
     }
 
     fun findElementsGreaterThanId(tableName: String, id: Int, findingField: String): List<String> {
@@ -169,9 +137,12 @@ class Client(private val conn : Connection) {
         sb.append("SELECT ")
         addArguments(sb, arrayOf(findingField), false)
         sb.append(" FROM $tableName WHERE id > ? ORDER BY id ASC")
-        val stm = conn.prepareStatement(sb.toString());
-        stm.setString(1, id.toString());
-        chooseFromResultSet(stm.executeQuery(), arrayOf(findingField));
+        val rs = conn.prepareStatement(sb.toString()).apply {
+            setString(1, id.toString());
+        }.executeQuery()
+        while (rs.next()) {
+            answer.add(rs.getString(findingField))
+        }
         return answer
     }
 
@@ -190,44 +161,22 @@ class Client(private val conn : Connection) {
     fun innerJoin(firstTableName: String, secondTableName: String,
                          firstFields: Array<String>, secondFields: Array<String>,
                                         firstCommonField : String, secondCommonField : String,
-                                                                    type : String) : List<String> {
+                                                                    type : String) : ResultSet {
         val sb = StringBuilder();
         sb.append("SELECT ")
-        var columnNames = firstFields + secondFields
+        val columnNames = firstFields + secondFields
         addArguments(sb, columnNames, false)
         sb.append(" FROM $firstTableName $type ")
         sb.append(" JOIN $secondTableName ON $firstTableName.$firstCommonField=$secondTableName.$secondCommonField")
         sb.append(" ORDER BY user_id ASC")
-        columnNames = changeColumnsNames(columnNames)
-        val stm = conn.prepareStatement(sb.toString());
-        return chooseFromResultSet(stm.executeQuery(), columnNames);
+        return conn.prepareStatement(sb.toString()).executeQuery();
     }
-
-    /**
-     * Choose columnNames from resultSet
-     */
-    fun chooseFromResultSet(rs : ResultSet, columnNames: Array<String>): ArrayList<String> {
-        val answer = ArrayList<String>();
-        while(rs.next()) {
-            for (i in 1..rs.metaData.columnCount) {
-                for (j in columnNames) {
-                    when (rs.metaData.getColumnName(i)) {
-                        j -> {
-                            answer.add(rs.getString(i))
-                        }
-                    }
-                }
-            }
-        }
-        return answer
-    }
-
 
     fun getInnerUsersAndPosts(firstTableName: String, secondTableName: String,
                     firstFields: Array<String>, secondFields: Array<String>,
                     firstCommonField : String, secondCommonField : String) : List<UserAndPosts> {
         return toUserAndPostsList(innerJoin(firstTableName, secondTableName, firstFields, secondFields,
-            firstCommonField, secondCommonField, "INNER"));
+            firstCommonField, secondCommonField, "INNER"), firstFields, secondFields);
     }
 
 
@@ -245,32 +194,24 @@ class Client(private val conn : Connection) {
                                   secondFields: Array<String>, firstCommonField: String,
                                   secondCommonField: String): List<UserAndPosts> {
         return toUserAndPostsList(innerJoin(firstTableName, secondTableName, firstFields, secondFields,
-            firstCommonField, secondCommonField, "LEFT"))
+            firstCommonField, secondCommonField, "LEFT"), firstFields, secondFields)
     }
 
 
-    /**
-     * Collect UserAnsPosts from List<String>
-     */
-    private fun toUserAndPosts(list: List<String>) : UserAndPosts {
-        if (list.size != 4) {
-            throw IllegalArgumentException("Can't create User expected 4 arguments, but found ${list.size}")
-        }
-        return UserAndPosts(Integer.parseInt(list[0]), list[1], list[2], list[3]);
-    }
-
-    /**
-     * Collect UserAnsPosts to list by List<String>
-     */
-    private fun toUserAndPostsList(list: List<String>) : List<UserAndPosts> {
+    private fun toUserAndPostsList(rs: ResultSet, usersFields: Array<String>, postField: Array<String>)
+                                                                                            : List<UserAndPosts> {
         val result = ArrayList<UserAndPosts>()
-        for (i in 0..list.size - 3) {
-            if (i % 4 != 0) {
-                continue
-            }
-            result.add(toUserAndPosts(listOf(list[i], list[i + 1], list[i + 2], list[i + 3])))
+        val usersF = changeColumnsNames(usersFields)
+        val postF = changeColumnsNames(postField)
+        while (rs.next()) {
+            result.add(UserAndPosts(
+                userID = rs.getInt(usersF[0]),
+                userName = rs.getString(usersF[1]),
+                userSurname = rs.getString(usersF[2]) ,
+                post = rs.getString(postF[0])
+            ))
         }
-        return result;
+        return result
     }
 
     /**
@@ -280,7 +221,7 @@ class Client(private val conn : Connection) {
     fun groupUsersByRoles(): ArrayList<UserWithRoles> {
         val result = ArrayList<UserWithRoles>()
         val sb = StringBuilder();
-        var columnNames : Array<String> = arrayOf("roles.role", "GROUP_CONCAT(users.surname)")
+        val columnNames : Array<String> = arrayOf("roles.role", "GROUP_CONCAT(users.surname)")
         //SELECT BLOCK
             sb.append("SELECT ")
             addArguments(sb, columnNames, false)
@@ -290,18 +231,24 @@ class Client(private val conn : Connection) {
             sb.append(" INNER JOIN users ON user_roles.user_id=users.id")
         // GROUP
             sb.append(" GROUP BY roles.role ORDER BY roles.id ASC")
-        // STATEMENT
-        val stm = conn.prepareStatement(sb.toString());
-        // CHOOSE ANSWER FIELD FROM RESULT SET
-        columnNames = changeColumnsNames(columnNames)
-        val list = chooseFromResultSet(stm.executeQuery(), columnNames)
-        for (i in list.indices) {
-            if (i % 2 != 0) {
-                continue
-            }
-            result.add(toUserRole(listOf(list[i], list[i + 1])))
+        val rs = conn.prepareStatement(sb.toString()).executeQuery();
+        while (rs.next()) {
+            result.add(UserWithRoles(
+                role = Role.valueOf(rs.getString("role")),
+                users = rs.getString("GROUP_CONCAT(users.surname)"),
+            ))
         }
         return result;
+    }
+
+    fun changeColumnsNames(columnNames: Array<String>): Array<String> {
+        for (i in columnNames.indices) {
+            if (columnNames[i].indexOf("GROUP_CONCAT") != -1) {
+                continue;
+            }
+            columnNames[i] = columnNames[i].split(".").last()
+        }
+        return columnNames
     }
 
 }
