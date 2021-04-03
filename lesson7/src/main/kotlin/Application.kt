@@ -1,3 +1,4 @@
+import kotlin.random.Random
 
 fun main() {
     printTaskName(1, "Create thread with different ways:")
@@ -8,13 +9,45 @@ fun main() {
     }.start()
     val someThread = Thread {
         println("I'm daemon!")
-        Thread.sleep(4000)
+        Thread.sleep(100000)
         println("I can't print this, because I'm daemon.")
     }
     someThread.isDaemon = true
     someThread.start();
     priorityThreads()
+    Thread.sleep(1000);
     printTaskName(2, "One thread write, other wait.")
+    val consCount = arrayOf(0, 0, 0, 0)
+    val dataBase = DataBase()
+    val arrayThreads = ArrayList<Thread>()
+    for (i in 0..2) {
+        arrayThreads.add(Thread {
+            val consumer = Consumer(dataBase)
+            while (!dataBase.endingReading) {
+                val data = consumer.get()
+                if (data != null) {
+                    println("$i consumer get data: $data")
+                    consCount[i]++;
+                }
+            }
+        })
+        arrayThreads.last().start()
+    }
+    val producer = Thread{
+        val producer = Producer(dataBase)
+        for (i in 1..1000) {
+            producer.set(Random.nextInt().toString())
+        }
+        dataBase.endingReading = true
+    }
+    producer.start()
+    producer.join()
+    for (i in 0..2) {
+        arrayThreads[i].join()
+    }
+
+    println("Results: ${consCount[0]} ${consCount[1]} ${consCount[2]}")
+
 
 }
 
