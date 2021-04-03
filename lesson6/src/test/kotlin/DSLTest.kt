@@ -19,17 +19,14 @@ class DSLTest {
             every { buyCoffee(any())} returns false
             every{MiniOfficeDSL {orderCoffee()}}
         }
-        assertAll("Default values should be returned",
-            {assertEquals(true, office.orderCoffee())},
-            {assertEquals(100, office.getMoney())},
-            {assertEquals(10, office.getCoffeePackets())},
-            {assertEquals("Ilya", office.getBossName())},
-            {assertEquals("Svetlana", office.secretaryName)},
-
-            {assertEquals(false, office.buyCoffee(2)) },
-            {assertEquals(testOffice.getCoffeePackets(),
-                                        MiniOfficeDSL("Boss", "Svetlana").getCoffeePackets())}
-        )
+        assertEquals(true, office.orderCoffee())
+        assertEquals(100, office.getMoney())
+        assertEquals(10, office.getCoffeePackets())
+        assertEquals("Ilya", office.getBossName())
+        assertEquals("Svetlana", office.secretaryName)
+        assertEquals(false, office.buyCoffee(2))
+        assertEquals(testOffice.getCoffeePackets(),
+                                    MiniOfficeDSL("Boss", "Svetlana").getCoffeePackets())
     }
 
 
