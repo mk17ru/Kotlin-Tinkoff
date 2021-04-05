@@ -1,15 +1,15 @@
 # Kotlin course
 ## Lesson2 
-OOP \
+OOP
 ## Lesson3 
-Collections Part1 \
+Collections Part1
 ## Lesson4 
-Collections Part2 \
+Collections Part2
 ## Lesson5 
-DataBases\
+DataBases
 ## Lesson6 
-Tests\
+Tests
 ## Lesson7 
-Concurrency \
+Concurrency
 ## Lesson8 
-Coroutines\
+Coroutines
