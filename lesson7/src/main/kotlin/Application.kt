@@ -1,4 +1,8 @@
+import java.util.*
+import java.util.concurrent.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
+import kotlin.time.seconds
 
 fun main() {
     printTaskName(1, "Create thread with different ways:")
@@ -10,7 +14,7 @@ fun main() {
     val someThread = Thread {
         println("I'm daemon!")
         Thread.sleep(100000)
-        println("I can't print this, because I'm daemon.")
+        println("Program shouldn't wait this message, because I'm daemon.")
     }
     someThread.isDaemon = true
     someThread.start();
@@ -26,7 +30,7 @@ fun main() {
             while (!dataBase.endingReading) {
                 val data = consumer.get()
                 if (data != null) {
-                    println("$i consumer get data: $data")
+                    //println("$i consumer get data: $data")
                     consCount[i]++;
                 }
             }
@@ -35,7 +39,7 @@ fun main() {
     }
     val producer = Thread{
         val producer = Producer(dataBase)
-        for (i in 1..1000) {
+        for (i in 1..10000) {
             producer.set(Random.nextInt().toString())
         }
         dataBase.endingReading = true
@@ -46,9 +50,33 @@ fun main() {
         arrayThreads[i].join()
     }
 
-    println("Results: ${consCount[0]} ${consCount[1]} ${consCount[2]}")
+    println("Results calls for threads: ${consCount[0]} ${consCount[1]} ${consCount[2]}")
+    printTaskName(3, "Program with po:")
+    increments()
 
+}
 
+fun increments() {
+    val futures = mutableListOf<Future<Pair<Long, Int>>>()
+    for (i in 1..3) {
+        val executors = Executors.newFixedThreadPool(i * 10)
+        val start = System.nanoTime()
+        executors.submit(Callable {
+            var counter = 0
+            repeat(1_000_000) {
+                counter++
+            }
+            if (counter == 1_000_000) {
+                println("YES $i")
+            }
+            Pair(System.nanoTime() - start, i)
+        }).also{futures.add(it)}
+        executors.shutdown()
+    }
+    futures.sortWith(compareBy({it.get().first}, {it.get().second}))
+    futures.forEach{
+        println("${it.get().first} ${it.get().second}")
+    }
 }
 
 
@@ -94,7 +122,6 @@ class MyThread : Thread() {
 class MyRunnable : Runnable {
     override fun run() {
         println("I'm Runnable. My name is ${Thread.currentThread().name}")
-
     }
 
 }
