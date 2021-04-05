@@ -1,5 +1,6 @@
 # Kotlin course
-## Lesson2 OOP \
+## Lesson2 
+OOP \
 ## Lesson3 
 Collections Part1 \
 ## Lesson4 
