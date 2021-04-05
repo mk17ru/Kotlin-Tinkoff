@@ -2,6 +2,7 @@ class Bank(override var income: Int, override var numberOfEmployees: Int, overri
 
     public override fun updateIncome() {
         income *= 4;
+
     }
 
     override fun printName() {
