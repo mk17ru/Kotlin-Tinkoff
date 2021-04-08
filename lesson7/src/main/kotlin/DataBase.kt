@@ -1,1 +1,0 @@
-data class DataBase(var data : String? = null, var endingReading : Boolean = false)
