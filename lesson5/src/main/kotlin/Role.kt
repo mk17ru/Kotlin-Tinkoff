@@ -4,4 +4,5 @@ enum class Role {
     PROGRAMMER,
     MODERATOR,
     USER
+
 }
