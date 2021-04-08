@@ -9,6 +9,7 @@ class Consumer(private val DataBase : DataBase) {
                 }
             }
         }
+
         return null
     }
 
