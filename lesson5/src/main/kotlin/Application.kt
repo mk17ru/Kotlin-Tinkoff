@@ -10,9 +10,11 @@ fun main() {
             val isExists = File(fileName).exists()
             val dataBase = Service(it)
             val init = TableInitializator(dataBase)
+
             if (!isExists) {
                 init.createTables();
             }
+
             printTaskName(1, "Find users by name:");
             dataBase.findUsersByName("Mikhail").forEach { println(it) }
             printTaskName(2, "Find elements which id > 2")

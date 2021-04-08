@@ -12,6 +12,6 @@ class UsersDAO {
     @Override
     fun getUsers() : List<User> {
         return users
-    }
+    };
 
 }
