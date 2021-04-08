@@ -1,10 +1,11 @@
+import java.lang.Math.abs
 import kotlin.random.Random
 
 class ServiceOptional() {
 
     private val shift = 5;
 
-    fun encryptPassword(password : String) : String {
+    private suspend fun encryptPassword(password : String) : String {
         val sb = StringBuilder();
         sb.append(password)
         for (i in sb.indices) {
@@ -13,7 +14,7 @@ class ServiceOptional() {
         return sb.toString()
     }
 
-    fun decryptionPassword(password : String) : String {
+    suspend fun decryptionPassword(password : String) : String {
         val sb = StringBuilder();
         sb.append(password)
         for (i in sb.indices) {
@@ -22,17 +23,17 @@ class ServiceOptional() {
         return sb.toString()
     }
 
-    fun generateString() : String {
+    suspend fun generateString() : String {
         val s = StringBuilder()
-        val size = Random.nextInt()
+        val size = (kotlin.math.abs(Random.nextInt())) % 25 + 5
         for (i in 1..size) {
-            s.append(Random.nextInt())
+            s.append((kotlin.math.abs(Random.nextInt()) % 250 + 1).toChar().toString())
         }
         return s.toString()
     }
 
     suspend fun generatePassword(): String {
-        return encryptPassword(generatePassword())
+        return encryptPassword(generateString())
     }
 
 

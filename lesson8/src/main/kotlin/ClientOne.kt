@@ -5,7 +5,7 @@ import java.sql.ResultSet
 import java.util.*
 import kotlin.collections.ArrayList
 
-class Client(private val conn : Connection) {
+class ClientOne(private val conn : Connection) {
 
     /**
      * Insert values in table
@@ -17,7 +17,7 @@ class Client(private val conn : Connection) {
         sb.append(" VALUES(")
         // CREATE (?, ?, ?, ...) for VALUES(?, ?, ...)
         sb.append("?, ".repeat(fields.size).substring(0, 3 * fields.size - 2))
-        sb.append(" ")
+        sb.append(")")
         val stm = conn.prepareStatement(sb.toString())
         // REPLACE ? for the inserted fields
         for (i in fields.indices) {
@@ -66,11 +66,11 @@ class Client(private val conn : Connection) {
     }
 
     fun findRolesIdByName(userRole: Role): Int {
-        var id: Int
+        var id : Int
         selectValue("roles", arrayOf("id"),"role", userRole.toString(), "role", false)
             .use {
                     resultSet ->
-                id = if (resultSet.next()) 0 else resultSet.getInt("id")
+                id = if (!resultSet.next()) -1 else resultSet.getInt("id")
             }
         return id
     }
@@ -172,47 +172,6 @@ class Client(private val conn : Connection) {
         return conn.prepareStatement(sb.toString()).executeQuery();
     }
 
-    fun getInnerUsersAndPosts(firstTableName: String, secondTableName: String,
-                              firstFields: Array<String>, secondFields: Array<String>,
-                              firstCommonField : String, secondCommonField : String) : List<UserAndPosts> {
-        return toUserAndPostsList(innerJoin(firstTableName, secondTableName, firstFields, secondFields,
-            firstCommonField, secondCommonField, "INNER"), firstFields, secondFields);
-    }
-
-
-    /**
-     * Create Left Inner Join Users and Posts
-     * @param firstTableName first table name
-     * @param secondTableName first table name
-     * @param firstFileds fields from first table
-     * @param secondFields fields from second table
-     * @param firstCommonField filed from first table which use for join
-     * @param secondCommonField filed from second table which use for join
-     * @return {@link List<UserAndPosts>}
-     */
-    fun getInnerLeftUsersAndPosts(firstTableName: String, secondTableName: String, firstFields: Array<String>,
-                                  secondFields: Array<String>, firstCommonField: String,
-                                  secondCommonField: String): List<UserAndPosts> {
-        return toUserAndPostsList(innerJoin(firstTableName, secondTableName, firstFields, secondFields,
-            firstCommonField, secondCommonField, "LEFT"), firstFields, secondFields)
-    }
-
-
-    private fun toUserAndPostsList(rs: ResultSet, usersFields: Array<String>, postField: Array<String>)
-            : List<UserAndPosts> {
-        val result = ArrayList<UserAndPosts>()
-        val usersF = changeColumnsNames(usersFields)
-        val postF = changeColumnsNames(postField)
-        while (rs.next()) {
-            result.add(UserAndPosts(
-                userID = rs.getInt(usersF[0]),
-                userName = rs.getString(usersF[1]),
-                userSurname = rs.getString(usersF[2]) ,
-                post = rs.getString(postF[0])
-            ))
-        }
-        return result
-    }
 
     /**
      * Group Users by their roles
@@ -249,6 +208,10 @@ class Client(private val conn : Connection) {
             columnNames[i] = columnNames[i].split(".").last()
         }
         return columnNames
+    }
+
+    fun insertUser(user : User) {
+        insertValue("users", arrayOf("name", "surname"), user.name, user.surname)
     }
 
 }

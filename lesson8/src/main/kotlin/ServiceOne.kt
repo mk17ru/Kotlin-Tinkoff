@@ -3,7 +3,7 @@ import java.sql.Statement
 import java.util.ArrayList
 
 class ServiceOne(conn: Connection) {
-    private val client : Client = Client(conn)
+    private val client : ClientOne = ClientOne(conn)
 
     fun addUsers() {
         client.addUsers()
@@ -34,19 +34,6 @@ class ServiceOne(conn: Connection) {
         return client.findElementsGreaterThanId(tableName, id, field)
     }
 
-    fun getInnerUsersAndPosts(firstTableName: String, secondTableName: String,
-                              firstFields : Array<String>, secondFields : Array<String>,
-                              firstCommonField : String, secondCommonField : String): List<UserAndPosts> {
-        return client.getInnerUsersAndPosts(firstTableName, secondTableName, firstFields, secondFields,
-            firstCommonField, secondCommonField)
-    }
-
-    fun getInnerLeftUsersAndPosts(firstTableName: String, secondTableName: String,
-                                  firstFields : Array<String>, secondFields : Array<String>,
-                                  firstCommonField : String, secondCommonField : String): List<UserAndPosts> {
-        return client.getInnerLeftUsersAndPosts(firstTableName, secondTableName, firstFields, secondFields,
-            firstCommonField, secondCommonField)
-    }
 
     fun groupUsersByRoles(): ArrayList<UserWithRoles> {
         return client.groupUsersByRoles();
@@ -54,5 +41,10 @@ class ServiceOne(conn: Connection) {
 
     fun findUsersSortBy(name: String, sortValue : String): List<User> {
         return client.findUsersByName(name, sortValue)
+    }
+
+    suspend fun insertUser(user : User) : User {
+        client.insertUser(user)
+        return user
     }
 }
