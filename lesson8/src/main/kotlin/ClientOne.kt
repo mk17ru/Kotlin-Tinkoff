@@ -148,32 +148,6 @@ class ClientOne(private val conn : Connection) {
 
 
     /**
-     * Create Inner Join Users and Posts
-     * @param firstTableName first table name
-     * @param secondTableName first table name
-     * @param firstFileds fields from first table
-     * @param secondFields fields from second table
-     * @param firstCommonField filed from first table which use for join
-     * @param secondCommonField filed from second table which use for join
-     * @param type type of join
-     * @return {@link List<UserAndPosts>}
-     */
-    fun innerJoin(firstTableName: String, secondTableName: String,
-                  firstFields: Array<String>, secondFields: Array<String>,
-                  firstCommonField : String, secondCommonField : String,
-                  type : String) : ResultSet {
-        val sb = StringBuilder();
-        sb.append("SELECT ")
-        val columnNames = firstFields + secondFields
-        addArguments(sb, columnNames, false)
-        sb.append(" FROM $firstTableName $type ")
-        sb.append(" JOIN $secondTableName ON $firstTableName.$firstCommonField=$secondTableName.$secondCommonField")
-        sb.append(" ORDER BY user_id ASC")
-        return conn.prepareStatement(sb.toString()).executeQuery();
-    }
-
-
-    /**
      * Group Users by their roles
      * @return ArrayList<ArrayList<UserWithRoles>> where Map role -> users
      */
