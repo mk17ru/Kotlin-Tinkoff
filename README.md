@@ -12,14 +12,14 @@ Tests
 ## [Lesson7](https://github.com/mk17ru/Kotlin-Tinkoff/tree/main/lesson7) 
 Concurrency
 ## [Lesson8]() 
-Coroutines
+Coroutines // Pull request
 ## [Lesson9]()
-Http
+Http // Pull request
 ## [Lesson10]()
-Ktor
+Ktor // TODO
 ## [Lesson11]()
-Queues
+Queues // TODO
 ## [Lesson12]()
-Kotlin-DSL
+Kotlin-DSL // TODO
 ## [Lesson13]()
-Docker
+Docker // TODO
