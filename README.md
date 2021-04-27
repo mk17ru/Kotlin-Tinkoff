@@ -1,5 +1,5 @@
 # Kotlin course
-## [Lesson2] : https://github.com/mk17ru/Kotlin-Tinkoff/tree/main/lessson2 
+## [Lesson2](https://github.com/mk17ru/Kotlin-Tinkoff/tree/main/lessson2)
 OOP
 ## Lesson3 
 Collections Part1
