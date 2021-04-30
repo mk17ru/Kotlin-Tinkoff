@@ -1,1 +1,0 @@
-data class Event(val name: String, val numberOfPeople: Int)
