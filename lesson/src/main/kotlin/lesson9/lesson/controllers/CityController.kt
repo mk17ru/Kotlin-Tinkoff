@@ -14,18 +14,21 @@ import org.springframework.http.HttpStatus.*
 import org.springframework.web.server.ResponseStatusException
 
 @Tag(name = "city", description = "The City API")
-@Controller
+@RestController
 @RequestMapping("/api/city")
 class CityController(private val cityRepository: CityRepository) {
 
 
     @Operation(summary = "Add city", tags = ["city"])
-    @PostMapping("/{city}")
+    @PostMapping
     @ResponseBody
-    fun addCity(@PathVariable city: String): String {
-        cityRepository.save(City(0, city))
-        return "CitySaved"
+    fun addCity(@RequestBody city: City): City {
+        return cityRepository.save(city)
     }
 
+    @Operation(summary = "Gets all cities", tags = ["city"])
+    @GetMapping
+    @ResponseStatus(OK)
+    fun findCities() : List<City> = cityRepository.findAll()
 
 }

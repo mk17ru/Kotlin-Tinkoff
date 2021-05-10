@@ -8,8 +8,8 @@ import java.util.*
 @Service
 class UserService(private val userRepository: UserRepository) {
 
-    fun addUser(user : User) {
-        userRepository.save(user)
+    fun addUser(user : User) : User {
+        return userRepository.save(user)
     }
 
     fun removeUser(id : Long) {
@@ -20,18 +20,22 @@ class UserService(private val userRepository: UserRepository) {
         return userRepository.findById(id)
     }
 
-    fun updateUserLoginById(id : Long, login : String) : Boolean {
-        val user = userRepository.findById(id).orElse(null)
-        return if (user == null) {
-            false
+    fun updateUser(id : Long, user : User) : User? {
+        val u = userRepository.findById(id).orElse(null)
+        return if (u != null) {
+            u.firstname = user.firstname
+            u.lastname = user.lastname
+            u.login = user.login
+            u.cityId = user.cityId
+            userRepository.save(u)
         } else {
-            user.login = login
-            userRepository.save(user)
-            true
+            null
         }
     }
 
-    fun findAll(): MutableList<User> {
-        return userRepository.findAll()
+    fun findAll(): List<User> {
+        val d = userRepository.findAll()
+        println(d)
+        return d
     }
 }

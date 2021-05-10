@@ -13,51 +13,46 @@ import org.springframework.web.server.ResponseStatusException
 
 
 @Tag(name = "user", description = "The User API")
-@Controller
-@RequestMapping("/api/user")
+@RestController
+@RequestMapping("/api/users")
 class UserController(private val userRepository: UserService, private val cityRepository: CityRepository) {
 
     @Operation(summary = "Gets user", tags = ["user"])
-    @GetMapping("/get/{id}")
+    @GetMapping("/{id}")
     @ResponseBody
-    fun findUser(@PathVariable id: Long) : User = userRepository.findUserById(id).orElse(null)
-                                ?: throw ResponseStatusException(NOT_FOUND, "User don't exist")
+    @ResponseStatus(OK)
+    fun findUser(@PathVariable id: Long) : User =
+        userRepository.findUserById(id).orElse(null) ?: throw ResponseStatusException(NOT_FOUND, "User don't exist")
 
 
     @Operation(summary = "Gets all users", tags = ["user"])
-    @GetMapping("/get/all")
-    @ResponseBody
-    fun findUsers() : MutableList<User> = userRepository.findAll()
+    @GetMapping
+    @ResponseStatus(OK)
+    fun findUsers() : List<User> = userRepository.findAll()
 
 
     @Operation(summary = "Add user", tags = ["user"])
-    @PostMapping("/save/{login}/{firstname}/{lastname}/{city}")
+    @PostMapping
     @ResponseBody
-    fun addUser(@PathVariable login: String, @PathVariable firstname: String, @PathVariable lastname: String,
-                                                @PathVariable city: String): String {
-        val c = cityRepository.findCityByName(city) ?: throw ResponseStatusException(NOT_FOUND, "City don't exist")
-        userRepository.addUser(User(0, login, firstname, lastname, c.id))
-        return "UserSaved"
+    @ResponseStatus(CREATED)
+    fun addUser(@RequestBody user : User): User {
+        val c = cityRepository.findCityById(user.cityId)
+                                            ?: throw ResponseStatusException(NOT_FOUND, "City don't exist")
+        return userRepository.addUser(User(0, user.login, user.firstname, user.lastname, c.id))
     }
 
     @Operation(summary = "Delete user", tags = ["user"])
-    @DeleteMapping("/remove/{id}")
+    @DeleteMapping("/{id}")
     @ResponseBody
+    @ResponseStatus(OK)
     fun deleteUser(@PathVariable id: Long) = userRepository.removeUser(id)
 
 
     @Operation(summary = "Update user", tags = ["user"])
-    @PutMapping("/update/{id}/{login}")
+    @PutMapping("/{id}")
     @ResponseBody
-    fun updateUser(@PathVariable id: Long, @PathVariable login : String): String {
-
-        val f = userRepository.updateUserLoginById(id, login)
-        if (f) {
-            return "User will be update!"
-        } else {
-            throw ResponseStatusException(NOT_FOUND, "User don't exist")
-        }
+    @ResponseStatus(OK)
+    fun updateUser(@PathVariable id: Long, @RequestBody user : User): User {
+        return userRepository.updateUser(id, user) ?: throw ResponseStatusException(NOT_FOUND, "User don't exist")
     }
-
-
 }
