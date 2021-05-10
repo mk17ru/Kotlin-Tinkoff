@@ -2,8 +2,7 @@ import java.sql.Connection
 import java.sql.Statement
 import java.util.ArrayList
 
-class ServiceOne(conn: Connection) {
-    private val client : ClientOne = ClientOne(conn)
+class ServiceOne(private val client : ClientOne) {
 
     fun addUsers() {
         client.addUsers()
@@ -43,7 +42,7 @@ class ServiceOne(conn: Connection) {
         return client.findUsersByName(name, sortValue)
     }
 
-    suspend fun insertUser(user : User) : User {
+    fun insertUser(user : User) : User {
         client.insertUser(user)
         return user
     }

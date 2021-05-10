@@ -5,7 +5,7 @@ class ServiceOptional() {
 
     private val shift = 5;
 
-    private suspend fun encryptPassword(password : String) : String {
+    private fun encryptPassword(password : String) : String {
         val sb = StringBuilder();
         sb.append(password)
         for (i in sb.indices) {
@@ -14,7 +14,7 @@ class ServiceOptional() {
         return sb.toString()
     }
 
-    suspend fun decryptionPassword(password : String) : String {
+    fun decryptionPassword(password : String) : String {
         val sb = StringBuilder();
         sb.append(password)
         for (i in sb.indices) {
@@ -23,7 +23,7 @@ class ServiceOptional() {
         return sb.toString()
     }
 
-    suspend fun generateString() : String {
+    fun generateString() : String {
         val s = StringBuilder()
         val size = (kotlin.math.abs(Random.nextInt())) % 25 + 5
         for (i in 1..size) {
@@ -32,7 +32,7 @@ class ServiceOptional() {
         return s.toString()
     }
 
-    suspend fun generatePassword(): String {
+    fun generatePassword(): String {
         return encryptPassword(generateString())
     }
 

@@ -17,7 +17,8 @@ suspend fun main() = runBlocking {
     try {
         val isExists = File(fileName).exists()
         val conn = DriverManager.getConnection(DB_URL).use {
-            val dataBase = ServiceOne(it)
+            val client = ClientOne(it)
+            val dataBase = ServiceOne(client)
             val users = UsersDAO().getUsers()
             val service = ServiceOptional()
             val init = TableInitializator(dataBase)
@@ -25,13 +26,19 @@ suspend fun main() = runBlocking {
                 init.createTables();
             }
             val list = synchronizedList(ArrayList<UserWithPassword>())
-            for (i in 1..10) {
+            list.addAll(java.util.Collections.nCopies(10 * users.size, null))
+            val tasks = synchronizedList(ArrayList<Job>())
+            for (i in 0..9) {
                 for (j in users.indices) {
                     val job = GlobalScope.launch {
-                        list.add(createUserWithPassword(dataBase, users[j], service))
+                        list[i * users.size + j] = createUserWithPassword(dataBase, users[j], service)
                     }
-                    job.join()
+                    job.start()
+                    tasks.add(job)
                 }
+            }
+            for (i in 0 until 10 * users.size) {
+                tasks[i].join()
             }
             list.forEach{mem -> println(mem)}
         }
