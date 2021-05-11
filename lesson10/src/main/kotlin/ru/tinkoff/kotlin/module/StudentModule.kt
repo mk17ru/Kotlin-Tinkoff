@@ -19,11 +19,14 @@ import ru.tinkoff.kotlin.student.service.StudentService
 fun Application.studentModule() {
     val studentService : StudentService by closestDI().instance()
     routing {
-        route("/students") {
+        route("/api/students") {
             get {
                 call.respond(studentService.findAll())
             }
-            put("/update/{id}") {
+            get("/{id}") {
+                call.respond(studentService.find(Integer.parseInt(call.parameters["id"])))
+            }
+            put("/{id}") {
                 val request = call.receive<CreateStudentRequest>()
                 val id = Integer.parseInt(call.parameters["id"])
                 studentService.update(
@@ -35,7 +38,7 @@ fun Application.studentModule() {
                     )
                 )
             }
-            delete("/delete/{id}") {
+            delete("/{id}") {
                 studentService.delete(Integer.parseInt(call.parameters["id"]))
             }
             put("/changeGroup/{id}") {
@@ -43,12 +46,12 @@ fun Application.studentModule() {
                 val id = Integer.parseInt(call.parameters["id"])
                 studentService.changeGroup(id, request.group)
             }
-            post("/create") {
+            post {
                 val request = call.receive<CreateStudentRequest>()
                 call.respond(studentService.create(request.name, request.surname, request.group))
             }
 
-            get("/groupStudents/{number}") {
+            get("/group/{groupId}") {
                 val number = Integer.parseInt(call.parameters["number"])
                 call.respond(studentService.findStudentsByGroup(number))
             }

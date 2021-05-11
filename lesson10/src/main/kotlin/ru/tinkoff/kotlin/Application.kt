@@ -26,7 +26,6 @@ fun main() {
         }
         studentModule()
         groupModule()
-        configureSerialization()
     }
     embeddedServer.start(wait = true)
 }

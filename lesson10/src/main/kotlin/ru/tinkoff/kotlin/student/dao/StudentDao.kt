@@ -30,12 +30,13 @@ class StudentDao(private val database : Database) {
     )
 
     fun find(name : String, surname: String): Student? = transaction(database) {
-        val student = Students.select { (Students.name eq name) and (Students.surname eq surname) }
-        if (student.any()) {
-            extractStudent(student.single())
-        } else {
-            null
-        }
+        val student = Students.select { (Students.name eq name) and (Students.surname eq surname) }.firstOrNull()
+        if (student == null) null else extractStudent(student)
+    }
+
+    fun find(id : Int): Student? = transaction(database) {
+        val st = Students.select { (Students.id eq id) }.firstOrNull()
+        if (st == null) null else extractStudent(st)
     }
 
     fun delete(id : Int) = transaction(database) {
