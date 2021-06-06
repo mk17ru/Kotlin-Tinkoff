@@ -61,7 +61,7 @@ data class UserWithFriend(val id: Int, val name: String, val friendsIds: List<In
 Tests
 ## [Lesson7](https://github.com/mk17ru/Kotlin-Tinkoff/tree/main/lesson7) 
 ### Concurrency
-## [Lesson8]() 
+## [Lesson8](https://github.com/mk17ru/Kotlin-Tinkoff/tree/main/lesson8) 
 ### Coroutines // Pull request
 ## [Lesson9]()
 ### Http // Pull request
