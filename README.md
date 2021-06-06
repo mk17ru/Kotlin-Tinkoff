@@ -62,9 +62,9 @@ Tests
 ## [Lesson7](https://github.com/mk17ru/Kotlin-Tinkoff/tree/main/lesson7) 
 ### Concurrency
 ## [Lesson8](https://github.com/mk17ru/Kotlin-Tinkoff/tree/main/lesson8) 
-### Coroutines // Pull request
+### Coroutines
 ## [Lesson9](https://github.com/mk17ru/Kotlin-Tinkoff/tree/main/lesson9)
-### Http // Pull request
+### Http
 ## [Lesson10]()
 ### Ktor // Pull request
 ## [Lesson11]()
