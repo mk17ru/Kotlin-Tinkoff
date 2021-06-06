@@ -39,7 +39,7 @@ data class UserFriends(val userId: Int, val friendsIds: List<Int>)<br />
 <br />
 data class UserWithFriend(val id: Int, val name: String, val friendsIds: List<Int>)<br />
 ## [Lesson5](https://github.com/mk17ru/Kotlin-Tinkoff/tree/main/lesson5) 
-DataBases\
+### DataBases
   Выбрать предметную область (можно такую же как и в 4 задание, по коллекция )\
 Создать три класса данных, не менее 3х полей у каждого. Одно из полей должно каким-то образов связывать эти классы.\
 Реализовать в этих классах связку один ко многим и многие-ко-многим (для этого понадобится еще 1 класс( таблица в БД) )\
@@ -60,16 +60,16 @@ DataBases\
 ## [Lesson6](https://github.com/mk17ru/Kotlin-Tinkoff/tree/main/lesson6) 
 Tests
 ## [Lesson7](https://github.com/mk17ru/Kotlin-Tinkoff/tree/main/lesson7) 
-Concurrency
+### Concurrency
 ## [Lesson8]() 
-Coroutines // Pull request
+### Coroutines // Pull request
 ## [Lesson9]()
-Http // Pull request
+### Http // Pull request
 ## [Lesson10]()
-Ktor // TODO
+### Ktor 
 ## [Lesson11]()
-Queues // TODO
+### Queues 
 ## [Lesson12]()
-Kotlin-DSL // TODO
+### Kotlin-DSL
 ## [Lesson13]()
-Docker // TODO
+### Docker 
