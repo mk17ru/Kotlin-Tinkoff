@@ -66,10 +66,10 @@ Tests
 ## [Lesson9]()
 ### Http // Pull request
 ## [Lesson10]()
-### Ktor 
+### Ktor // Pull request
 ## [Lesson11]()
-### Queues 
+### Queues // Pull request
 ## [Lesson12]()
-### Kotlin-DSL
+### Kotlin-DSL // Pull request
 ## [Lesson13]()
-### Docker 
+### Docker // Pull request
